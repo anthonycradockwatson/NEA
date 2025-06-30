@@ -1,0 +1,7 @@
+Django>=3.2
+psycopg2-binary
+numpy
+pandas
+scikit-learn
+thefuzz
+nltk
