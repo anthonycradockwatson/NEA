@@ -1,0 +1,114 @@
+{
+  "categories": [
+    {
+      "category_name": "Rear_Bumpers",
+      "category_image_url": "rear_bumper_medium",
+      "items": [
+        {
+          "id": "rb_id_1",
+          "item_name": "Mugen Style Rear Bumper",
+          "merchant_name": "Mugen",
+          "image_url_medium": "rear_bumper_mugen_medium",
+          "price": "$320",
+          "is_sponsored": true,
+          "color_stack": {
+            "available_colors": [
+              {
+                "color_name": "Matte_Black",
+                "color_image_url": "matte_black_image_url1"
+              },
+              {
+                "color_name": "White",
+                "color_image_url": "white_image_url1"
+              }
+            ]
+          }
+        },
+        {
+          "id": "rb_id_2",
+          "item_name": "TRD Rear Diffuser Bumper",
+          "merchant_name": "TRD",
+          "image_url_medium": "rear_bumper_trd_medium",
+          "price": "$410",
+          "is_sponsored": false,
+          "color_stack": {
+            "available_colors": [
+              {
+                "color_name": "Black",
+                "color_image_url": "black_image_url7"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "category_name": "Grills",
+      "category_image_url": "grills_medium",
+      "items": [
+        {
+          "id": "grill_id_1",
+          "item_name": "Honeycomb Sport Grill",
+          "merchant_name": "Maxton Design",
+          "image_url_medium": "grill_honeycomb_medium",
+          "price": "$120",
+          "is_sponsored": false,
+          "color_stack": {
+            "available_colors": [
+              {
+                "color_name": "Gloss_Black",
+                "color_image_url": "gloss_black_image_url1"
+              }
+            ]
+          }
+        },
+        {
+          "id": "grill_id_2",
+          "item_name": "Carbon Fiber Mesh Grill",
+          "merchant_name": "Seibon",
+          "image_url_medium": "grill_carbon_mesh_medium",
+          "price": "$180",
+          "is_sponsored": true,
+          "color_stack": {
+            "available_colors": [
+              {
+                "color_name": "Carbon_Black",
+                "color_image_url": "carbon_black_image_url1"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "category_name": "Spoilers",
+      "category_image_url": "spoiler_big",
+      "items": [
+        {
+          "id": "sp_id_5",
+          "item_name": "GT Wing Spoiler",
+          "merchant_name": "APR Performance",
+          "image_url_medium": "spoiler_gt_wing_medium",
+          "price": "$300",
+          "is_sponsored": true
+        },
+        {
+          "id": "sp_id_7",
+          "item_name": "Ducktail Spoiler",
+          "merchant_name": "Duraflex",
+          "image_url_medium": "spoiler_ducktail_medium",
+          "price": "$250",
+          "is_sponsored": false
+        },
+        {
+          "id": "sp_id_8",
+          "item_name": "Carbon Lip Spoiler",
+          "merchant_name": "Seibon",
+          "image_url_medium": "spoiler_lip_medium",
+          "price": "$270",
+          "is_sponsored": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+    "user_id":"dde7d100-0b3f-4e38-b29d-27afca7f115d",
+    "part_id": [
+        "F-4bff8b85-e98c-47fb-a8a2-c8e3287704c6",
+        "G-13dfd9b7-713f-4404-bc63-cb787744561f",
+        "W-051b8337-d432-4d00-a0d7-25cfb35e7e23"
+    ]
+}
+{
+  "email": "driver1@example.com",
+  "password": "securepass1234567890",
+  "car_make": "Honda",
+  "car_model": "Civic 2Dr",
+  "car_year": 2020,
+  "car_cylinders": 4,
+  "car_engine_displacement": 2.0,
+  "car_transmission": "Automatic (variable gear ratios)"
+}
+{
+    "user_id":"dde7d100-0b3f-4e38-b29d-27afca7f115d",
+    "part_id": [
+        "F-4bff8b85-e98c-47fb-a8a2-c8e3287704c6"
+    ]
+} 
+{
+    "user_id":"029b094d-704a-4577-b3d8-4e32678c5438",
+    "query":"racing",
+    "category":[
+        "Wheels",
+        "Spoilers",
+        "Grills"
+    ]
+} 
+[
+  {
+    "id": "W-85c20283-d9a9-4d5d-8448-17ab7eaf90c4",
+    "category": "Wheels",
+    "item_name": "OZ Racing Ultraleggera",
+    "merchant_name": "OZ Racing",
+    "image_url": "wheels_ultraleggera_medium",
+    "price": 450,
+    "is_sponsored": 1,
+    "colour": [],
+    "size": []
+  },
+  {
+    "id": "W-97802aca-7eef-431c-a0b1-5602f53bcd84",
+    "category": "Wheels",
+    "item_name": "Japan Racing JR 37",
+    "merchant_name": "Japan Racing",
+    "image_url": "wheels_jr37_medium",
+    "price": 345,
+    "is_sponsored": 1,
+    "colour": [],
+    "size": []
+  }
+]
+{
+    "part_id":"F-4bff8b85-e98c-47fb-a8a2-c8e3287704c6",
+    "category":"front_bumpers"
+}
+{   
+  "id": "F-4bff8b85-e98c-47fb-a8a2-c8e3287704c6",
+  "category": "Front_Bumpers",
+  "item_name": "GT Wing Spoiler",
+  "merchant_name": "APR Performance",
+  "image_url": "spoiler_gt_wing_medium",
+  "price": 300,
+  "is_sponsored": 1,
+  "colour": {
+    "available_colours": [
+      "Black"
+    ]
+  },
+  "size": []
+}
+{
+  "user_id": "029b094d-704a-4577-b3d8-4e32678c5438",
+  "query": "racinh",
+  "category": [
+    "Wheels"
+  ]
+}
+[
+  {
+    "id": "W-85c20283-d9a9-4d5d-8448-17ab7eaf90c4",
+    "category": "Wheels",
+    "item_name": "OZ Racing Ultraleggera",
+    "merchant_name": "OZ Racing",
+    "image_url": "wheels_ultraleggera_medium",
+    "price": 450,
+    "is_sponsored": 1,
+    "colour": [],
+    "size": []
+  },
+  {
+    "id": "W-97802aca-7eef-431c-a0b1-5602f53bcd84",
+    "category": "Wheels",
+    "item_name": "Japan Racing JR 37",
+    "merchant_name": "Japan Racing",
+    "image_url": "wheels_jr37_medium",
+    "price": 345,
+    "is_sponsored": 1,
+    "colour": [],
+    "size": []
+  }
+]
