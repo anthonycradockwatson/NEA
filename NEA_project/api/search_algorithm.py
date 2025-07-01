@@ -5,8 +5,11 @@ from nltk.stem import PorterStemmer
 from thefuzz import fuzz    
 from django.db import connection
 from.mergesort import return_sorted_list
-import string
 import math
+
+nltk.download('punkt')      # Tokenizer
+nltk.download('averaged_perceptron_tagger')  # POS tagger model
+
 
 
 class Search(): # By having 2 different search functions, I am able to have a list of different returns decreasing in relevancy
