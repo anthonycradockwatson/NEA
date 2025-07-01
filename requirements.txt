@@ -5,3 +5,5 @@ pandas
 scikit-learn
 thefuzz
 nltk
+dotenv
+djangorestframework
