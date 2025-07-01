@@ -56,7 +56,7 @@ def get_search(request):
 
     search_instance=Search(query, category)
     keyword_results = search_instance.keyword_search() 
-    fuzzy_results = search_instance.fuzzy_search() 
+    fuzzy_results = search_instance.fuzzy_search(keyword_results) 
     results=[]
 
     # Does 2 different searches to ensure nothing is missed, makes sure that there are no repeats
