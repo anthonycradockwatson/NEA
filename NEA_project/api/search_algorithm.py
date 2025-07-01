@@ -4,8 +4,10 @@ from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from thefuzz import fuzz    
 from django.db import connection
+from.mergesort import return_sorted_list
 import string
-import sqlite3
+import math
+
 
 class Search(): # By having 2 different search functions, I am able to have a list of different returns decreasing in relevancy
     # Additionally, they both complement eachother to ensure that no items are missed
@@ -72,11 +74,14 @@ class Search(): # By having 2 different search functions, I am able to have a li
                         results.append([returned[0]])
         return results
 
-    def fuzzy_search(self): # stem the search query and item name to decrease lookup time and maybe remove a loop
+    def fuzzy_search(self, previous_results): # stem the search query and item name to decrease lookup time and maybe remove a loop
         # Also maybe make it so it disrehgards parts already found
         self.search_prompt = self.query.split()
-
-        results=[]
+        previous_items=tuple([id[0][0] for id in previous_results])
+        if previous_items == ():
+            previous_items=(" "," ")
+        elif len(previous_items) == 1:
+            previous_items+=(" ",)
 
         if len(self.category) == 1:
             tuple_category = (self.category[0],'')
@@ -84,9 +89,9 @@ class Search(): # By having 2 different search functions, I am able to have a li
             tuple_category = tuple(self.category)
 
         with connection.cursor() as sql:
-            sql.execute(f"SELECT item_name FROM Parts WHERE category IN {tuple_category}")
+            sql.execute(f"SELECT item_name FROM Parts WHERE category IN {tuple_category} AND part_id NOT IN {previous_items}")
             item_names=sql.fetchall() # Gets all the relevant items to compare against 
-            sql.execute(f"SELECT merchant_name FROM Parts WHERE category IN {tuple_category}")
+            sql.execute(f"SELECT merchant_name FROM Parts WHERE category IN {tuple_category} AND part_id NOT IN {previous_items}")
             merchant_names=sql.fetchall() # Gets all the relevant merchants to compare against
 
         merchant_item_names=[] # This is where all the items and their merchants will be stored
@@ -96,30 +101,37 @@ class Search(): # By having 2 different search functions, I am able to have a li
             item_list.append(merchant_names[x][0]) # Appends the merchant name to the end of the item name
             merchant_item_names.append(item_list) 
 
+       
         item_ratios=[] # This is where all of the ratios and their items will be stored
 
         for i in range(len(merchant_item_names)):
-            for x in range(len(self.search_prompt)):
+            current_item_token=merchant_item_names[i]
+            search_string = " ".join(self.search_prompt).lower()
+            item_string = " ".join(current_item_token).lower()
 
-                current_item_token=merchant_item_names[i]
+            partial_score = fuzz.partial_ratio(search_string, item_string) 
+            # A partial ratio is used because it does a levenshtein calculation on the closest substring
+            # so you can compare an entire search to the merchant_item_names rather than having to nest a bunch 
+            # more loops 
 
-                for j in range(len(current_item_token)):
-
-                    # Essentially compares all the words of the search prompt with all the words of every return 
-
-                    simple_ratio=fuzz.ratio(self.search_prompt[x], current_item_token[j])
-                    token_ratio=fuzz.token_sort_ratio(self.search_prompt[x], current_item_token[j])
-
-                    largest_current_ratio=max(simple_ratio, token_ratio) # Gets the largest ratio from the 2 different methods
-                    item_ratios.append([largest_current_ratio, merchant_item_names[i][-1]])
+            if [partial_score, current_item_token[-1]] not in item_ratios:
+                item_ratios.append([partial_score, current_item_token[-1]])
 
         # Sorts the ratios in ascending order, specifying to sort by the ratio value
-        sorted_ratios=sorted(item_ratios, key=lambda x:x[0], reverse=True)
+        sorted_ratios=return_sorted_list(item_ratios)
         results=[]
 
-        for x in range(len(sorted_ratios)): 
+        total_letters = math.fsum(len(word) for word in self.search_prompt)
+        x_val=total_letters*-0.35
+        min_rating=50+49.9*(math.pow(math.e, x_val))
+        # Follows the equation y = 50 + 49.9 e^-0.035x where y is the minimum rating and x is the num of characters in the search
 
-            if sorted_ratios[x][0] >= 60: # 60 is the limit where most unneccesary searches will be filtered out
+        for x in range(len(sorted_ratios)): 
+            
+            if sorted_ratios[x][0] >= min_rating: # Because the similarity is a partial similarity, if the search prompt is really short
+                # many things will return as valid matches, so by having the min rating decrease as search prompt length increases, you 
+                # decrease the number of unrelated returns
+
                 with connection.cursor() as sql:
                     sql.execute(f"""SELECT * FROM Parts WHERE merchant_name = '{sorted_ratios[x][1]}' 
                                 AND category IN {tuple_category}""")
