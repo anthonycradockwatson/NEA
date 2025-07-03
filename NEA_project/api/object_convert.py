@@ -1,6 +1,6 @@
 from .recommendations import recommendation
 from .serializers import item_json
-from .models import Part, Wheels, Spoilers, Front_bumpers, Rear_bumpers, Grills
+from .models import Part, Wheels, Spoilers, Front_Bumpers, Rear_Bumpers, Grills
 
 def object_converter(results, user_id, category):
 
@@ -8,8 +8,8 @@ def object_converter(results, user_id, category):
     part_types = {
         "Wheels": Wheels,
         "Spoilers": Spoilers,
-        "Front Bumpers": Front_bumpers,
-        "Rear Bumpers": Rear_bumpers,
+        "Front_Bumpers": Front_Bumpers,
+        "Rear_Bumpers": Rear_Bumpers,
         "Grills": Grills
     }
     # Loop through all the results and create a Part object for each one
@@ -34,7 +34,7 @@ def object_converter(results, user_id, category):
                 result_models.append(result_model) 
     
     if result_models == []: # If no results are found, return no results found
-        return {"No results found"}
+        return  None
     
     if len(result_models) > 1:
         recommend_parts=recommendation(result_models, user_id, category)
