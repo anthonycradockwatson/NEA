@@ -3,7 +3,6 @@ from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from django.db import connection
 import math
-import sqlite3
 import numpy as np
 from .cosine_similarity import cos_similarity
 from .mergesort import return_sorted_list
