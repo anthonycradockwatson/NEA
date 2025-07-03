@@ -33,7 +33,8 @@ SECRET_KEY = 'django-insecure-zjl9hsbh96e58*wokf-)81(rr2gvx6#5^_oz6@73&*dutoe=3^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['www.api.carfusion.app', 'api.carfusion.app', 'www.carfusion.app', 'carfusion.app', '178.62.61.247']
+ALLOWED_HOSTS = ['www.api.carfusion.app', 'api.carfusion.app', 'www.carfusion.app', 'carfusion.app', '178.62.61.247', '127.0.0.1']
+
 
 # Application definition
 
