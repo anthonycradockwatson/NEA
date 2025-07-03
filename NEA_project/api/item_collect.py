@@ -1,4 +1,3 @@
-import sqlite3
 from django.db import connection
 
 def item_collect(category, manufacturers):
@@ -14,7 +13,6 @@ def item_collect(category, manufacturers):
     else:
         category = tuple(category)
 
-    print(manufacturers, category)
     with connection.cursor() as sql:
         sql.execute(f"SELECT * FROM Parts WHERE category IN {category} AND merchant_name IN {manufacturers}")
         results = sql.fetchall()
