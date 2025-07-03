@@ -1,90 +1,50 @@
-from django.db import models
-from typing import Optional
-from dataclasses import dataclass, asdict
+from .recommendations import recommendation
+from .serializers import item_json
+from .models import Part, Wheels, Spoilers, Front_Bumpers, Rear_Bumpers, Grills
 
-# Create your models here.
-@dataclass
-class Search():
-    search: str
+def object_converter(results, user_id, category):
 
-    def __init__(self, search):
-        self.search=search
+    result_models=[]
+    part_types = {
+        "Wheels": Wheels,
+        "Spoilers": Spoilers,
+        "Front_Bumpers": Front_Bumpers,
+        "Rear_Bumpers": Rear_Bumpers,
+        "Grills": Grills
+    }
+    # Loop through all the results and create a Part object for each one
+    if results: # If results are found, create a list of part objects to be returned
+            for x in range(len(results)):
+                
+                current_part=results[x]
+                part_data = {
+                    "id": current_part[0],
+                    "category": current_part[1],
+                    "item_name": current_part[2],
+                    "merchant_name": current_part[3],
+                    "image_url": current_part[4],
+                    "price": current_part[5],
+                    "is_sponsored": current_part[6],
+                    "colour": current_part[7] if len(current_part) > 7 else [],
+                    "size": current_part[8] if len(current_part) > 8 else []
+                }
+                category = part_data["category"]
+                part_class=part_types.get(category, Part)
+                result_model=part_class(**part_data)
+                result_models.append(result_model) 
+    
+    if result_models == []: # If no results are found, return no results found
+        return  None
+    
+    if len(result_models) > 1:
+        recommend_parts=recommendation(result_models, user_id, category)
+    else:
+        recommend_parts=result_models
 
-@dataclass
-class Colour_stack():
-    available_colours: list[str]
+    json_results = []
+    for x in range(len(recommend_parts)): # Loop through all the results and serialize them to be returned
 
-    def __init__(self, colour_list: list[str]):
-        self.available_colours = colour_list
+        serialized_return=item_json(recommend_parts[x]) # Otherwise serialize the objects and return them
+        json_results.append(serialized_return)
 
-@dataclass
-class Size_stack():
-    size: list[int]
-    size_unit: str
-
-    def __init__(self, size_unit: str, available_sizes: list[int]):
-        self.size = available_sizes
-        self.size_unit = size_unit
-
-@dataclass
-class Part():
-    id: str
-    category: str
-    item_name: str
-    merchant_name: str
-    image_url: str
-    price: str
-    is_sponsored: bool
-    colour: Optional[Colour_stack] = None  
-    size: Optional[Size_stack] = None 
-
-    def __init__(self, id, category, item_name, merchant_name, image_url, price, is_sponsored, colour=[], size=[]):  # Part models for returning
-        self.id = id
-        self.category=category
-        self.item_name = item_name
-        self.merchant_name = merchant_name
-        self.image_url = image_url
-        self.price = price
-        self.is_sponsored = is_sponsored
-        self.colour = colour
-        self.size = size
-
-class Wheels(Part):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.like_weight = 0.20
-        self.price_weight = 0.20
-        self.sponsor_weight = 0.45
-        self.variations_weight = 0.15
-
-class Spoilers(Part):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.like_weight = 0.35
-        self.price_weight = 0.4
-        self.sponsor_weight = 0.25
-        self.variations_weight = 0
-
-class Front_bumpers(Part):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.like_weight = 0.20
-        self.price_weight = 0.25
-        self.sponsor_weight = 0.40
-        self.variations_weight = 0.15
-
-class Rear_bumpers(Part):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.like_weight = 0.15
-        self.price_weight = 0.25
-        self.sponsor_weight = 0.45
-        self.variations_weight = 0.15
-
-class Grills(Part):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.like_weight = 0.20
-        self.price_weight = 0.25
-        self.sponsor_weight = 0.40
-        self.variations_weight = 0.15 
+    return json_results
