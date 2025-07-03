@@ -14,12 +14,10 @@ from .user_likes import user_liked
 from .car_table_input import add_car
 from .user_likes import user_liked, user_unlike
 from .item_collect import item_collect
-from .validate import validation
+from .validate import validation, sql_check
 
 """ To do list:
 seperate endpoints for 3d model items
- - maybe add more error handling
- make it so that if the car already exists it just send the car_id in the user signups
  - add some like inner joins or smth
 
 search_query = 
@@ -47,12 +45,14 @@ def get_search(request):
     user_id=request_body.get('user_id') # Collects the user id from the request
 
     valid_input= input_cleansing(query) # cleans prompt 
+    valid_request=validation(category)
+    valid_sql=sql_check(user_id, "User_accounts", "account_id")
 
     if not valid_input:
        return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
     
     valid_request=validation(category, user_id)
-    if valid_request == False:
+    if valid_request == False or valid_sql == False:
          return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
 
     search_instance=Search(query, category)
@@ -88,7 +88,10 @@ def get_item_data(request):
     part_id = request_body.get('part_id')
 
     valid_request=validation(category)
-    if valid_request == False:
+    valid_sql=sql_check(part_id, "Parts", "part_id")
+
+    valid_request=validation(category)
+    if valid_request == False or valid_sql == False:
          return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -121,9 +124,11 @@ def get_items(request):
     user_id= request_body.get('user_id') 
     manufacturers = request_body.get('manufacturers')
 
-    valid_request=validation(category, user_id, manufacturers)
+    valid_request=validation(category)
+    valid_sql1=sql_check(user_id, "User_accounts", "account_id")
+    valid_sql2=sql_check(manufacturers, "Parts", "merchant_name")
 
-    if valid_request == False:
+    if valid_request == False or valid_sql1 == False or valid_sql2 == False:
          return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
 
     results=item_collect(category, manufacturers)
@@ -169,6 +174,12 @@ def post_user_liked(request):
     part_id=request_body.get('part_id')
     user_id=request_body.get('user_id')
 
+    valid_sql1=sql_check(user_id, "User_accounts", "account_id")
+    valid_sql2=sql_check(part_id, "Parts", "part_id")
+
+    if valid_sql1 == False or valid_sql2 == False:
+         return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
+
     like_added=user_liked(part_id, user_id)
     
     if like_added == True:
@@ -186,9 +197,16 @@ def post_user_unliked(request):
     part_id=request_body.get('part_id')
     user_id=request_body.get('user_id')
 
+    valid_sql1=sql_check(user_id, "User_accounts", "account_id")
+    valid_sql2=sql_check(part_id, "Parts", "part_id")
+
+    if valid_sql1 == False or valid_sql2 == False:
+         return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
+
     like_removed=user_unlike(part_id, user_id)
     
     if like_removed == True:
         return(Response(status=status.HTTP_204_NO_CONTENT))
-    else:
-        return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
+
+    
