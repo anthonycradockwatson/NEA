@@ -5,7 +5,7 @@ def validation(category, user_id=None, manufacturers = None):
         with connection.cursor() as sql:
             sql.execute(f"Select merchant_name from Parts")
             allowed_manufacturers=set(row[0] for row in sql.fetchall())
-    if set(manufacturers).issubset(allowed_manufacturers) == False:
+        if set(manufacturers).issubset(allowed_manufacturers) == False:
             return False
         
     if user_id:
