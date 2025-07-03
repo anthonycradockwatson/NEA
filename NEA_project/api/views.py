@@ -14,23 +14,18 @@ from .user_likes import user_liked
 from .car_table_input import add_car
 from .user_likes import user_liked, user_unlike
 from .item_collect import item_collect
+from .validate import validation
 
-
-# Create your views here.
 """ To do list:
- - set up server
-figure the images
 seperate endpoints for 3d model items
- - set up class system for parts for custom weighting 
- - add some more error handling
+ - maybe add more error handling
  make it so that if the car already exists it just send the car_id in the user signups
  - add some like inner joins or smth
 
-
-search query - 
+search_query = 
 {
     "user_id":"2fdd047c-62d5-4ab4-95ba-a68f915a786f",
-    "query":"racing",
+    "query":"rcing",
     "category":[    
         "Wheels",
         "Spoilers",
@@ -38,6 +33,7 @@ search query -
     ]
 } 
 """
+
 
 @api_view(['GET'])
 
@@ -51,8 +47,13 @@ def get_search(request):
     user_id=request_body.get('user_id') # Collects the user id from the request
 
     valid_input= input_cleansing(query) # cleans prompt 
+
     if not valid_input:
-        return Response({"Invalid Characters in search prompt"})
+       return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    valid_request=validation(category, user_id)
+    if valid_request == False:
+         return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
 
     search_instance=Search(query, category)
     keyword_results = search_instance.keyword_search() 
@@ -72,7 +73,10 @@ def get_search(request):
     # Turns results into parts and subparts objects and sorts them by recommendations
     results=object_converter(results, user_id, category) 
 
-    return Response(results) 
+    if results==None:
+        return Response({"No results found"}, status=status.HTTP_200_OK)
+    
+    return Response(results, status=status.HTTP_200_OK) 
 
 @api_view(['GET'])
 
@@ -82,6 +86,11 @@ def get_item_data(request):
     request_body=post_serializer(request.body)
     category = request_body.get('category')
     part_id = request_body.get('part_id')
+
+    valid_request=validation(category)
+    if valid_request == False:
+         return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
+
 
     current_part, colour, size=item_data(part_id, category)
     # If there are sizes or colours, assign them to the part object
@@ -96,7 +105,10 @@ def get_item_data(request):
 
     results=object_converter(current_part, None, category)
 
-    return Response(results)
+    if results==None:
+        return Response({"No results found"}, status=status.HTTP_200_OK)
+
+    return Response(results, status=status.HTTP_200_OK)
 
     
 @api_view(['GET'])
@@ -109,15 +121,19 @@ def get_items(request):
     user_id= request_body.get('user_id') 
     manufacturers = request_body.get('manufacturers')
 
+    valid_request=validation(category, user_id, manufacturers)
+
+    if valid_request == False:
+         return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
+
     results=item_collect(category, manufacturers)
-    split_results=[]
+  
+    final_results=object_converter(results, user_id, category) 
 
-    for x in range(len(results)):
-        split_results.append([results[x]]) # This is to work with the object converter function because it shares it with the search
-
-    final_results=object_converter(split_results, user_id, category) 
-
-    return Response(final_results) 
+    if final_results==None:
+        return Response({"No results found"}, status=status.HTTP_200_OK)
+    
+    return Response(final_results, status=status.HTTP_200_OK) 
 
 @api_view(['POST'])
 
@@ -175,4 +191,4 @@ def post_user_unliked(request):
     if like_removed == True:
         return(Response(status=status.HTTP_204_NO_CONTENT))
     else:
-        return(Response(status=status.HTTP_404_NOT_FOUND))
+        return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
