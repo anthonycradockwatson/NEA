@@ -4,6 +4,7 @@ from django.db import connection, transaction
 
 def user_liked(part_id, account_id):
 
+    committed=False
     with connection.cursor() as sql:
         sql.execute(f"""
             CREATE TABLE IF NOT EXISTS User_likes 
@@ -17,19 +18,19 @@ def user_liked(part_id, account_id):
             """)
         transaction.commit()
 
-    for x in range(len(part_id)):
+    if len(part_id) == 1:
+        tuple_part_id=part_id[0],''
+    else:
+        tuple_part_id=tuple(part_id)
 
-        if len(part_id) == 1:
-            tuple_part_id=part_id[0],''
-        else:
-            tuple_part_id=tuple(part_id)
+    for x in range(len(part_id)):
 
         with connection.cursor() as sql:
 
             sql.execute(f"SELECT liked_part_id FROM User_likes WHERE account_id='{account_id}' AND liked_part_id IN {tuple_part_id}")
-            existing_likes_id = sql.fetchall()
-
-        if part_id[x] not in existing_likes_id:
+            existing_likes_id = {row[0] for row in sql.fetchall()}
+                  
+        if set([part_id[x]]).issubset(existing_likes_id) == False:
 
             like_uuid=uuid_verifier("User_likes", "like_id")
 
@@ -39,26 +40,30 @@ def user_liked(part_id, account_id):
                             [like_uuid, account_id, part_id[x]]
                             )
                 transaction.commit()
-    return True
+            committed=True
+
+        
+    return committed
 
 def user_unlike(part_id, account_id):
 
+    if len(part_id) == 1:
+        tuple_part_id=(part_id[0],'')
+    else:
+        tuple_part_id=tuple(part_id)
+
+    committed=False
     for x in range(len(part_id)):
 
         with connection.cursor() as sql:
 
-            if len(part_id) == 1:
-                tuple_part_id=(part_id[0],'')
-            else:
-                tuple_part_id=tuple(part_id)
-
             sql.execute(f"SELECT liked_part_id FROM User_likes WHERE account_id='{account_id}' AND liked_part_id IN {tuple_part_id}")
-            existing_likes_id = sql.fetchall()
+            existing_likes_id = {row[0] for row in sql.fetchall()}
 
-        if part_id[x] in existing_likes_id:
+        if set([part_id[x]]).issubset(existing_likes_id) == True:
             
             with connection.cursor() as sql:
-                sql.execute(f"DELETE FROM user_likes WHERE liked_part_id = {part_id[x]}")
+                sql.execute(f"DELETE FROM user_likes WHERE liked_part_id = '{part_id[x]}'")
                 transaction.commit()
-                
-    return True
+            committed=True
+    return committed
