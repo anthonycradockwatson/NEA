@@ -44,6 +44,9 @@ def get_search(request):
     category = request_body.get('category') # Collects the category from the request
     user_id=request_body.get('user_id') # Collects the user id from the request
 
+    if category == None or query ==  None:
+        return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
+    
     valid_input= input_cleansing(query) # cleans prompt 
     valid_request=validation(category)
     valid_sql=sql_check(user_id, "User_accounts", "account_id")
@@ -85,7 +88,10 @@ def get_item_data(request):
     request_body=post_serializer(request.body)
     category = request_body.get('category')
     part_id = request_body.get('part_id')
-
+    
+    if category == None or part_id ==  None:
+        return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
+    
     valid_request=validation(category)
     valid_sql=sql_check(part_id, "Parts", "part_id")
 
@@ -122,7 +128,10 @@ def get_items(request):
     category = request_body.get('category') 
     user_id= request_body.get('user_id') 
     manufacturers = request_body.get('manufacturers')
-
+    
+    if category == None or manufacturers ==  None:
+        return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
+    
     valid_request=validation(category)
     valid_sql1=sql_check(user_id, "User_accounts", "account_id")
     valid_sql2=sql_check(manufacturers, "Parts", "merchant_name")
@@ -175,7 +184,10 @@ def post_user_liked(request):
 
     valid_sql1=sql_check(user_id, "User_accounts", "account_id")
     valid_sql2=sql_check(part_id, "Parts", "part_id")
-
+    
+    if part_id == None or user_id ==  None:
+        return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
+    
     if valid_sql1 == False or valid_sql2 == False:
          return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -195,7 +207,10 @@ def post_user_unliked(request):
 
     part_id=request_body.get('part_id')
     user_id=request_body.get('user_id')
-
+    
+    if part_id == None or user_id ==  None:
+        return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
+    
     valid_sql1=sql_check(user_id, "User_accounts", "account_id")
     valid_sql2=sql_check(part_id, "Parts", "part_id")
 
