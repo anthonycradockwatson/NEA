@@ -1,6 +1,14 @@
 from django.db import connection
-def validation(category):        
+def validation(category):       
+    
+    if type(category) != list:
+        if len([category]) == 1:
+            category=[category]
+        else:
+            category=list(category)
+
     allowed_categories = {"Wheels", "Spoilers", "Front_Bumpers", "Rear_Bumpers", "Grills"}
+    print(set(category).issubset(allowed_categories) == False)
     if set(category).issubset(allowed_categories) == False:
         return False
     
