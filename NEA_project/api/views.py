@@ -88,14 +88,12 @@ def get_item_data(request):
     request_body=post_serializer(request.body)
     category = request_body.get('category')
     part_id = request_body.get('part_id')
-    
     if category == None or part_id ==  None:
         return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
     
     valid_request=validation(category)
     valid_sql=sql_check(part_id, "Parts", "part_id")
 
-    valid_request=validation(category)
     if valid_request == False or valid_sql == False:
          return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
 
