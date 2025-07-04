@@ -51,7 +51,6 @@ def get_search(request):
     if not valid_input:
        return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
     
-    valid_request=validation(category, user_id)
     if valid_request == False or valid_sql == False:
          return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
 
