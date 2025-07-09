@@ -1,45 +1,26 @@
-import numpy as np
 
-def merge(list1, list2):
-
+def merge_pairs(list1, list2):
     temp_list = []
-
-    while len(list1) != 0 and len(list2) != 0:
-        if list1[0] < list2[0]:
-
+    while list1 != [] and list2 != []: # keeps going as long as both lists aren't empty
+        # Compare by rating (first element of each pair)
+        if list1[0][0] < list2[0][0]:
             temp_list.append(list2.pop(0))
-
         else:
-
             temp_list.append(list1.pop(0))
 
     return temp_list + list1 + list2
 
-def merge_sort_full(num_list):
-
-    if len(num_list) <= 1:
-        return num_list
+def merge_sort_pairs(pair_list):
+    # recursively breaks everything down to be one thing, then compares each item, sorting them
+    if len(pair_list) <= 1:
+        return pair_list
     
-    mid = len(num_list) // 2
-    left = merge_sort_full(num_list[:mid])
-    right = merge_sort_full(num_list[mid:]) 
-    return merge(left, right)
+    mid = len(pair_list) // 2
+    left = merge_sort_pairs(pair_list[:mid])
+    right = merge_sort_pairs(pair_list[mid:])
+
+    return merge_pairs(left, right)
 
 def return_sorted_list(original_list):
-
-    values = [item[0] for item in original_list]
-
-    sorted_values = merge_sort_full(values)
-
-    final_ratings = []
-
-    for x in range(len(sorted_values)):
-        for i in range(len(original_list)):
-
-            if original_list[i][0] == sorted_values[x] and original_list[i] not in final_ratings:
-
-                final_ratings.append(original_list[i])
-                break
-            
-    return final_ratings
-
+    # Sorts [rating, item] pairs by rating
+    return merge_sort_pairs(original_list)
