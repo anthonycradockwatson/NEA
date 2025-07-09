@@ -25,7 +25,7 @@ def object_converter(results, user_id, category):
                     "image_url": current_part[4],
                     "price": current_part[5],
                     "is_sponsored": current_part[6],
-                    "colour": current_part[7] if len(current_part) > 7 else [],
+                    "colour": current_part[7] if len(current_part) > 7 else [], # dynamically assigns colour and size specs when needed
                     "size": current_part[8] if len(current_part) > 8 else []
                 }
                 category = part_data["category"]
