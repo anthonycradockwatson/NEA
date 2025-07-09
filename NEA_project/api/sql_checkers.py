@@ -1,5 +1,4 @@
-import sqlite3
-import psycopg2
+
 import uuid
 from django.db import connection
 def existing_entry(entry, table, column_name): # This function checks if a given entry/name already 
@@ -13,7 +12,7 @@ def existing_entry(entry, table, column_name): # This function checks if a given
     if entry_exists:
 
         valid_entry = False
-
+    
     return valid_entry
 
 def uuid_verifier(table, id_column): # This function generates a unique UUID and checks it against the existing IDs in the specified table.
