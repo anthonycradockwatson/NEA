@@ -1,6 +1,6 @@
 import math
 
-def cos_similarity(a, b):
+def cos_similarity(a, b): # a cosine similarity formula to compare 2 vectors a and b
     if len(a) == 0 or len(b) == 0:
         return "Cannot compare empty arrays"
     
