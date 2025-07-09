@@ -1,5 +1,4 @@
 import os
-import django
 import sys
 
 import pandas as pd  
@@ -18,7 +17,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'NEA_project.settings')
 
 def change_csv():
-    # Read the CSV
+    # only getting relevant csv fields
     csv_path = r"C:\Users\antho\PycharmProjects\NEA\all-vehicles-model.csv"
     df = pd.read_csv(csv_path)
 
@@ -45,16 +44,17 @@ def csv_to_sql():
         transaction.commit()
 
     csv_path = r"C:\Users\antho\PycharmProjects\NEA\updated_models.csv"
-    df=pd.read_csv(csv_path)
+    df=pd.read_csv(csv_path) # This no longer works since cars got replaced with vehicle_models
     with connection.cursor() as sql:
         sql.execute("SELECT make, model, year FROM Cars")
         existing_cars = set(sql.fetchall())
 
-    df_filtered = df.apply(lambda row: (row['Make'], row['Model'], row['Year']) in existing_cars, axis=1)
-    df_filtered = df[df_filtered]
+    existing_cars_df = pd.DataFrame(list(existing_cars), columns=['Make', 'Model', 'Year'])
+    df_filtered = df.merge(existing_cars_df, on=['Make', 'Model', 'Year'], how='inner') # essentially filters by (make, model, year)
+    # to ensure the only entries left have the same (make, model, year), decreasing time taken for the for loop to run
     df_filtered = df_filtered.reset_index(drop=True)
 
-    for x in range(len(df_filtered)):
+    for x in range(len(df_filtered)): 
 
         make = str(df_filtered["Make"][x])
         model = str(df_filtered["Model"][x])
