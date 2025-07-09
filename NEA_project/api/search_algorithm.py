@@ -6,11 +6,8 @@ from thefuzz import fuzz
 from django.db import connection
 from.mergesort import return_sorted_list
 import math
-
 nltk.download('punkt')      # Tokenizer
 nltk.download('averaged_perceptron_tagger')  # POS tagger model
-
-
 
 class Search(): # By having 2 different search functions, I am able to have a list of different returns decreasing in relevancy
     # Additionally, they both complement eachother to ensure that no items are missed
@@ -25,11 +22,6 @@ class Search(): # By having 2 different search functions, I am able to have a li
 
         tokens = word_tokenize(search_prompt)
         
-        # Remove punctuation and stop words
-        tokens = [word for word in tokens if word not in string.punctuation]
-        stop_words = set(stopwords.words('english'))
-        tokens = [word for word in tokens if word not in stop_words]
-
         stemmer = PorterStemmer()
         stemmed_tokens = [stemmer.stem(word) for word in tokens]
         tagged_tokens=nltk.pos_tag(stemmed_tokens)
