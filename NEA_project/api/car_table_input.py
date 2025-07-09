@@ -1,5 +1,4 @@
-import sqlite3
-from .sql_checkers import uuid_verifier, existing_entry
+from .sql_checkers import uuid_verifier
 import pandas as pd  
 from django.db import connection, transaction
 
@@ -45,5 +44,11 @@ def add_car(make, model, year, cylinders, engine_displacement, transmission):
             return vehicle_model_id
         else:
             return None  # Car not found in CSV
-    else:
-        return None  # Car already exists in DB
+    else: # If the car exists already it returns the existing car id
+        with connection.cursor() as sql:
+            sql.execute("""
+                SELECT vehicle_model_id FROM Vehicle_Models
+                WHERE make=%s AND model=%s AND year=%s AND cylinders=%s AND engine_displacement=%s AND transmission=%s
+            """, [make, model, year, cylinders, engine_displacement, transmission])
+            car_id = sql.fetchone()[0]
+            return car_id
