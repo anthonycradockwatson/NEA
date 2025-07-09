@@ -7,7 +7,6 @@ import numpy as np
 from .cosine_similarity import cos_similarity
 from .mergesort import return_sorted_list
 
-# try add a collaborative filter where it considers users wth the siimilar cars 
 
 def recommendation(models, user_id, category):
 
