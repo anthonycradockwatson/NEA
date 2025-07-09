@@ -1,8 +1,11 @@
-import sqlite3
 from django.db import connection
 
-def item_data(part_id, table):
-    
+def item_data(part_id):
+
+    with connection.cursor() as sql:
+        sql.execute(f"SELECT category FROM Parts WHERE part_id = %s", (part_id,))
+        table = sql.fetchone()[0]
+
     link_table_name = f"{table.lower()}_link_table"
 
     # Check if the table exists
@@ -20,8 +23,9 @@ def item_data(part_id, table):
         # gets all the size variations by the given size ids
         item_sizes=[]
         size_ids = tuple(size_id[0] for size_id in size_ids)
+
         if len(size_ids) == 1:
-            size_ids = (size_ids[0])
+            size_ids = (size_ids[0], " ")
 #
         with connection.cursor() as sql:
             sql.execute(f"SELECT size, size_unit FROM Sizes WHERE size_id in {size_ids}")
@@ -42,7 +46,7 @@ def item_data(part_id, table):
         item_colours=[]
         colour_ids = tuple(colour_id[0] for colour_id in colour_ids)
         if len(colour_ids) == 1:
-            colour_ids = (colour_ids[0])
+            colour_ids = (colour_ids[0], " ")
      
         with connection.cursor() as sql: 
             sql.execute(f"SELECT colour FROM Colours WHERE colour_id in {colour_ids}")
@@ -62,4 +66,4 @@ def item_data(part_id, table):
         sql.execute(f"SELECT * FROM Parts WHERE part_id = %s", (part_id,))
         part_data= sql.fetchall()[0]
    
-    return part_data, item_colours, item_sizes
+    return table, part_data, item_colours, item_sizes
