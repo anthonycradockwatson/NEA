@@ -1,4 +1,4 @@
-import sqlite3
+
 from .sql_checkers import uuid_verifier
 from django.db import connection, transaction
 
@@ -63,7 +63,7 @@ def user_unlike(part_id, account_id):
         if set([part_id[x]]).issubset(existing_likes_id) == True:
             
             with connection.cursor() as sql:
-                sql.execute(f"DELETE FROM user_likes WHERE liked_part_id = '{part_id[x]}'")
+                sql.execute(f"DELETE FROM user_likes WHERE liked_part_id = '{part_id[x]}' AND account_id='{account_id}'")
                 transaction.commit()
             committed=True
     return committed
