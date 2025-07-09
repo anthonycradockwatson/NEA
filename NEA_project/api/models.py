@@ -1,32 +1,17 @@
-from django.db import models
+from dataclasses import dataclass
 from typing import Optional
-from dataclasses import dataclass, asdict
 
 # Create your models here.
-@dataclass
-class Search():
-    search: str
-
-    def __init__(self, search):
-        self.search=search
-
-@dataclass
 class Colour_stack():
-    available_colours: list[str]
-
     def __init__(self, colour_list: list[str]):
         self.available_colours = colour_list
 
-@dataclass
 class Size_stack():
-    size: list[int]
-    size_unit: str
-
     def __init__(self, size_unit: str, available_sizes: list[int]):
         self.size = available_sizes
         self.size_unit = size_unit
 
-@dataclass
+@dataclass # makes it easier to serialize later (turn into json)
 class Part():
     id: str
     category: str
@@ -35,10 +20,12 @@ class Part():
     image_url: str
     price: str
     is_sponsored: bool
-    colour: Optional[Colour_stack] = None  
+    colour: Optional[Colour_stack] = None  # Optionals are used to allow for parts to be made and added to later
+    # So when you're not looking at specific part data then you dont need colour and size variations
     size: Optional[Size_stack] = None 
 
-    def __init__(self, id, category, item_name, merchant_name, image_url, price, is_sponsored, colour=[], size=[]):  # Part models for returning
+    def __init__(self, id, category, item_name, merchant_name, image_url, price, is_sponsored, colour=[], size=[]): 
+         # Part models for returning
         self.id = id
         self.category=category
         self.item_name = item_name
