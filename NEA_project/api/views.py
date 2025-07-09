@@ -1,10 +1,8 @@
-from django.shortcuts import render
-from django.contrib.auth.hashers import make_password
+
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
-from .models import Search, Colour_stack, Part 
-from .serializers import item_json, post_serializer
+from .serializers import post_serializer
 from .object_convert import object_converter
 from .search_algorithm import Search
 from .item_data import item_data
@@ -14,22 +12,15 @@ from .user_likes import user_liked
 from .car_table_input import add_car
 from .user_likes import user_liked, user_unlike
 from .item_collect import item_collect
-from .validate import validation, sql_check
+from .validate import validation, sql_check, all_categories
 
 """ To do list:
 seperate endpoints for 3d model items
  - add some like inner joins or smth
 
 search_query = 
-{
-    "user_id":"2fdd047c-62d5-4ab4-95ba-a68f915a786f",
-    "query":"rcing",
-    "category":[    
-        "Wheels",
-        "Spoilers",
-        "Grills"
-    ]
-} 
+/api/get_search?query=rcing&user_id=2fdd047c-62d5-4ab4-95ba-a68f915a786f&category=Wheels&category=Spoilers&category=Grills
+
 """
 
 
@@ -37,19 +28,25 @@ search_query =
 
 def get_search(request): 
     # Endpoint to handle searches
-
-    request_body=post_serializer(request.body) # Collects the request body and parses it
-
-    query = request_body.get('query') # Collects the search query from the request
-    category = request_body.get('category') # Collects the category from the request
-    user_id=request_body.get('user_id') # Collects the user id from the request
+    query = request.query_params.get('query')
+    category = request.query_params.getlist('category') # Collects the category from the request
+    user_id=request.query_params.get('user_id') # Collects the user id from the request
 
     if category == None or query ==  None:
         return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
     
     valid_input= input_cleansing(query) # cleans prompt 
-    valid_request=validation(category)
-    valid_sql=sql_check(user_id, "User_accounts", "account_id")
+
+    if category != ["*"]: # allows for all categories to be accepted
+        valid_request=validation(category)
+    else:
+        valid_request=True
+        category=all_categories("category")
+    
+    if user_id is not None:
+        valid_sql=sql_check(user_id, "User_accounts", "account_id")
+    else:
+        valid_sql=True
 
     if not valid_input:
        return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
@@ -84,21 +81,18 @@ def get_search(request):
 
 def get_item_data(request):
     # When a user clicks on a specific part, it gets specific data like colour, size, part data etc
+    part_id = request.query_params.get('part_id')
 
-    request_body=post_serializer(request.body)
-    category = request_body.get('category')
-    part_id = request_body.get('part_id')
-    if category == None or part_id ==  None:
+    if part_id ==  None:
         return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
-    
-    valid_request=validation(category)
+
     valid_sql=sql_check(part_id, "Parts", "part_id")
 
-    if valid_request == False or valid_sql == False:
+    if valid_sql == False:
          return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
 
 
-    current_part, colour, size=item_data(part_id, category)
+    category, current_part, colour, size=item_data(part_id)
     # If there are sizes or colours, assign them to the part object
     current_part=current_part # Convert the part object to a list to append the colour and size
     if colour != []:
@@ -122,17 +116,30 @@ def get_item_data(request):
 def get_items(request):
     # Getting any items that meet the specifications
 
-    request_body=post_serializer(request.body) 
-    category = request_body.get('category') 
-    user_id= request_body.get('user_id') 
-    manufacturers = request_body.get('manufacturers')
-    
+    category = request.query_params.getlist('category') 
+    user_id= request.query_params.get('user_id') 
+    manufacturers = request.query_params.getlist('manufacturers')
+   
     if category == None or manufacturers ==  None:
         return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
     
-    valid_request=validation(category)
-    valid_sql1=sql_check(user_id, "User_accounts", "account_id")
-    valid_sql2=sql_check(manufacturers, "Parts", "merchant_name")
+    if category != ["*"]: # allows for all categories to be accepted
+        valid_request=validation(category)
+    else:
+        valid_request=True
+        category=all_categories("category")
+
+    if manufacturers != ["*"]: # allows for all manufacturers to be accepted
+        valid_sql2=sql_check(manufacturers, "Parts", "merchant_name")
+    else:
+        valid_sql2=True
+        manufacturers=all_categories("merchant_name")
+        
+    if user_id is not None:
+        valid_sql1=sql_check(user_id, "User_accounts", "account_id")
+    else:
+        valid_sql1=True
+
 
     if valid_request == False or valid_sql1 == False or valid_sql2 == False:
          return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
@@ -161,6 +168,12 @@ def post_user_signup(request):
     car_engine_displacement=request_body.get("car_engine_displacement")
     car_transmission=request_body.get("car_transmission")
 
+    valid_email=input_cleansing(email, True)
+    valid_password=input_cleansing(password)
+    
+    if not valid_email or not valid_password:
+       return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
+
     # Adds the car and account seperately just in case didn't specify car or just linking new car to existing account
     car_id=add_car(car_make, car_model, car_year, car_cylinders, car_engine_displacement, car_transmission)
     signup=user_signup_check(email, password, car_id)
@@ -180,12 +193,16 @@ def post_user_liked(request):
     part_id=request_body.get('part_id')
     user_id=request_body.get('user_id')
 
-    valid_sql1=sql_check(user_id, "User_accounts", "account_id")
-    valid_sql2=sql_check(part_id, "Parts", "part_id")
-    
     if part_id == None or user_id ==  None:
         return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
-    
+
+    valid_sql2=sql_check(part_id, "Parts", "part_id")
+
+    if user_id is not None:
+        valid_sql1=sql_check(user_id, "User_accounts", "account_id")
+    else:
+        valid_sql1=True
+
     if valid_sql1 == False or valid_sql2 == False:
          return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -209,8 +226,13 @@ def post_user_unliked(request):
     if part_id == None or user_id ==  None:
         return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
     
-    valid_sql1=sql_check(user_id, "User_accounts", "account_id")
     valid_sql2=sql_check(part_id, "Parts", "part_id")
+
+    if user_id is not None:
+        valid_sql1=sql_check(user_id, "User_accounts", "account_id")
+    else:
+        valid_sql1=True
+
 
     if valid_sql1 == False or valid_sql2 == False:
          return Response({"Invalid Request"}, status=status.HTTP_400_BAD_REQUEST)
