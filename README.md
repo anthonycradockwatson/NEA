@@ -32,6 +32,8 @@ The application features a built-in recommendation engine designed to surface re
 * **OOP-Driven Architecture:** Built using modular object-oriented principles to cleanly decouple data retrieval from recommendation logic.
 * **SQL & JSON Integration:** Aggregates user interaction data and metadata stored via SQL queries and JSON payloads to generate personalized suggestions.
 
+<img width="1600" height="1000" alt="image" src="https://github.com/user-attachments/assets/32be47b1-a7f4-4ffe-8c1d-fe5192dc6ba0" />
+
 
 ## Installation and running
 ```bash
