@@ -1,10 +1,15 @@
 # AQA Computer Science NEA
 ## Description
-This is the NEA for my AQA Computer Science A-level. It is the back-end for the AR startup Swappd which allows users to browse and view different car parts on their cars. This is not the current backend which has since changed, this is just what was submitted.
-It is a database-centered backend, which is able to fully handle a range of different GET and POST requests, contains 2 different search algorithms (keyword and fuzzy search) and includes a complex recommendation system made from 2 subsystems, 1 being a weighting 
-algorithm and one being a hybrid collaborative-content based system
+NEA Project for my Computer Science A-Level. It is a Python RESTful API Backend using a normalised relational PostgreSQL Database with the key complex features being the custom search and recommendation algorithm. 
 
-# Modules used
+## Key Features & Architecture
+
+- **Django & PostgreSQL API:** Built a object-oriented Python web API capable of complex SQL/JSON query handling, secure user authentication, and a dynamic recommendation engine.
+- **Nginx & Gunicorn Deployment:** Set up request routing and a reverse proxy configuration using Gunicorn and Nginx to ensure production-grade reliability and performance.
+- **Custom Levenshtein Search Engine:** Developed a fuzzy search algorithm from scratch using Levenshtein Distance with a configurable similarity threshold for accurate, error-tolerant queries.
+- **Defensive Security & Input Validation:** Implemented strict input sanitization, parameterized database queries, and defensive programming checks to prevent common web vulnerabilities (e.g., SQL injection, XSS).
+
+## Modules used
  - Django
  - Psycopg2-binary
  - Numpy
@@ -13,7 +18,19 @@ algorithm and one being a hybrid collaborative-content based system
  - Thefuzz
  - Nltk
  - Dotenv
- - Djangorestframework
+ - Django Rest Framework
+
+## Recommendation and Search Algorithm
+### 1. Custom Levenshtein Fuzzy Search
+To handle typos, partial matches, and variations in user queries without relying on heavy external search libraries, I engineered a custom search engine from scratch:
+* **Algorithm Core:** Computes the Levenshtein edit distance between the query string and database records.
+* **Dynamic Similarity Threshold:** Implements a configurable cutoff threshold to balance precision and recall, ensuring users get relevant results even with minor spelling errors.
+* **Performance Optimization:** Optimized text-preprocessing and indexing passes to minimize latency during query evaluation.
+
+### 2. Dynamic Recommendation System
+The application features a built-in recommendation engine designed to surface relevant content dynamically:
+* **OOP-Driven Architecture:** Built using modular object-oriented principles to cleanly decouple data retrieval from recommendation logic.
+* **SQL & JSON Integration:** Aggregates user interaction data and metadata stored via SQL queries and JSON payloads to generate personalized suggestions.
 
 
 ## Installation and running
